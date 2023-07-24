@@ -14,6 +14,7 @@ export const App = () => {
   useEffect(() => {
     if (query === '') {
       setIsLoading(false);
+      console.log(query);
       return;
     }
     setIsLoading(true);
