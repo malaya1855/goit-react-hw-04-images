@@ -1,65 +1,52 @@
-import { Component } from 'react';
+import { useEffect, useState } from 'react';
 
 import { SearchBar, ImageGallery, Button, Loader, TextEmpty } from 'components';
 import * as ImageApi from './utilities/imageApi';
 
-class App extends Component {
-  state = {
-    query: '',
-    page: 1,
-    photos: [],
-    showMore: false,
-    isLoading: false,
-    isEmpty: false,
-    modalImg: {},
-  };
+export const App = () => {
+  const [query, setQuery] = useState('');
+  const [page, setPage] = useState(1);
+  const [photos, setPhotos] = useState([]);
+  const [showMore, setShowMore] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isEmpty, setIsEmpty] = useState(false);
 
-  componentDidUpdate(_, prevState) {
-    const { query, page } = this.state;
-    if (prevState.query !== query || prevState.page !== page) {
-      this.setState({ isLoading: true });
-      ImageApi.getImages(query, page)
-        .then(({ hits, totalHits }) => {
-          this.setState(prevState => ({
-            photos: [...prevState.photos, ...hits],
-            showMore: page < Math.ceil(totalHits / 12),
-            isEmpty: hits.length === 0,
-          }));
-        })
-        .catch(error => console.log(error))
-        .finally(this.setState({ isLoading: false }));
+  useEffect(() => {
+    if (query === '') {
+      setIsLoading(false);
+      return;
     }
-  }
+    setIsLoading(true);
+    ImageApi.getImages(query, page)
+      .then(({ hits, totalHits }) => {
+        setPhotos(prevPhotos => [...prevPhotos, ...hits]);
+        setShowMore(page < Math.ceil(totalHits / 12));
+        setIsEmpty(hits.length === 0);
+      })
+      .catch(error => console.log(error))
+      .finally(() => setIsLoading(false));
+  }, [query, page]);
 
-  onHandleSubmit = query => {
-    this.setState({
-      query,
-      page: 1,
-      photos: [],
-      showMore: false,
-      isLoading: true,
-    });
+  const onHandleSubmit = query => {
+    setQuery(query);
+    setPage(1);
+    setPhotos([]);
+    setShowMore(false);
+    setIsLoading(true);
   };
 
-  onHandleClick = () => {
-    this.setState(prevstate => ({
-      page: prevstate.page + 1,
-    }));
+  const onHandleClick = () => {
+    setPage(prevPage => prevPage + 1);
   };
 
-  render() {
-    const { query, photos, showMore, isLoading, isEmpty } = this.state;
-    return (
-      <div>
-        <SearchBar onHandleSubmit={this.onHandleSubmit} />
-        <ImageGallery items={photos} />
+  return (
+    <div>
+      <SearchBar onHandleSubmit={onHandleSubmit} />
+      <ImageGallery items={photos} />
 
-        {showMore && <Button onClick={this.onHandleClick}>Load more</Button>}
-        {isEmpty && <TextEmpty query={query} />}
-        {isLoading && <Loader />}
-      </div>
-    );
-  }
-}
-
-export default App;
+      {showMore && <Button onClick={onHandleClick}>Load more</Button>}
+      {isEmpty && <TextEmpty query={query} />}
+      {isLoading && <Loader />}
+    </div>
+  );
+};

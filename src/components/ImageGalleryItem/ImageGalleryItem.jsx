@@ -1,37 +1,27 @@
-import { Component } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 
-import { ImgListItem, Image } from 'components';
-import { Modal } from 'components';
+import { ImgListItem, Image, Modal } from 'components';
 
-export class ImageGalleryItem extends Component {
-  state = {
-    isOpenModal: false,
+export const ImageGalleryItem = ({ item }) => {
+  const [openModal, setOpenModal] = useState(false);
+
+  const onModal = () => {
+    setOpenModal(!openModal);
   };
 
-  onModal = () => {
-    this.setState(({ isOpenModal }) => ({ isOpenModal: !isOpenModal }));
-  };
-
-  render() {
-    const { isOpenModal } = this.state;
-    const { id, webformatURL, tags, largeImageURL } = this.props.item;
-    return (
-      <div>
-        <ImgListItem key={id} onClick={this.onModal}>
-          <Image src={webformatURL} alt={tags} />
-        </ImgListItem>
-        {isOpenModal && (
-          <Modal
-            imageSrc={largeImageURL}
-            imageAlt={tags}
-            onClose={this.onModal}
-          />
-        )}
-      </div>
-    );
-  }
-}
+  const { id, webformatURL, tags, largeImageURL } = item;
+  return (
+    <div>
+      <ImgListItem key={id} onClick={onModal}>
+        <Image src={webformatURL} alt={tags} />
+      </ImgListItem>
+      {openModal && (
+        <Modal imageSrc={largeImageURL} imageAlt={tags} onClose={onModal} />
+      )}
+    </div>
+  );
+};
 
 ImageGalleryItem.propTypes = {
   webformatURL: PropTypes.string,

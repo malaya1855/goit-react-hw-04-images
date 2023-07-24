@@ -1,44 +1,39 @@
-import { Component } from 'react';
+import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 
 import { Overlay, ModalImage } from 'components';
 
-export class Modal extends Component {
-  componentDidMount() {
-    window.addEventListener('keydown', this.keyDown);
-  }
+export const Modal = ({ onClose, imageSrc, imageAlt }) => {
+  const [key, setKey] = useState(false);
+  useEffect(() => {
+    if (key) {
+      window.removeEventListener('keydown', keyDown);
+    } else {
+      window.addEventListener('keydown', keyDown);
+    }
+  });
 
-  componentWillUnmount() {
-    window.removeEventListener('keydown', this.keyDown);
-  }
-
-  keyDown = ev => {
+  const keyDown = ev => {
     if (ev.code === 'Escape') {
-      this.props.onClose();
+      setKey(true);
+      onClose();
     }
   };
 
-  onHandleClick = ev => {
+  const onHandleClick = ev => {
     if (ev.target === ev.currentTarget) {
-      this.props.onClose();
+      onClose();
     }
   };
 
-  render() {
-    const { imageSrc, imageAlt } = this.props;
-    return (
-      <Overlay onClick={this.onHandleClick}>
-        <ModalImage>
-          <img
-            src={imageSrc}
-            alt={imageAlt}
-            style={{ pointerEvents: 'auto' }}
-          />
-        </ModalImage>
-      </Overlay>
-    );
-  }
-}
+  return (
+    <Overlay onClick={onHandleClick}>
+      <ModalImage>
+        <img src={imageSrc} alt={imageAlt} style={{ pointerEvents: 'auto' }} />
+      </ModalImage>
+    </Overlay>
+  );
+};
 
 Modal.propTypes = {
   onClose: PropTypes.func.isRequired,
