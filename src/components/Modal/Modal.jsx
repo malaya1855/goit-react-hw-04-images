@@ -1,24 +1,19 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import PropTypes from 'prop-types';
 
 import { Overlay, ModalImage } from 'components';
 
 export const Modal = ({ onClose, imageSrc, imageAlt }) => {
-  const [key, setKey] = useState(false);
   useEffect(() => {
-    if (key) {
-      window.removeEventListener('keydown', keyDown);
-    } else {
+    const keyDown = ev => {
+      if (ev.code === 'Escape') {
+        onClose();
+      }
+    };
+    return () => {
       window.addEventListener('keydown', keyDown);
-    }
+    };
   });
-
-  const keyDown = ev => {
-    if (ev.code === 'Escape') {
-      setKey(true);
-      onClose();
-    }
-  };
 
   const onHandleClick = ev => {
     if (ev.target === ev.currentTarget) {
