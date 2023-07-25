@@ -12,8 +12,7 @@ export const App = () => {
   const [isEmpty, setIsEmpty] = useState(false);
 
   useEffect(() => {
-    if (query === '') {
-      setIsLoading(false);
+    if (!query) {
       return;
     }
     setIsLoading(true);
