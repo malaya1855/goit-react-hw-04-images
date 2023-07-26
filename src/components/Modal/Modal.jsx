@@ -10,8 +10,10 @@ export const Modal = ({ onClose, imageSrc, imageAlt }) => {
         onClose();
       }
     };
+    window.addEventListener('keydown', keyDown);
+
     return () => {
-      window.addEventListener('keydown', keyDown);
+      window.removeEventListener('keydown', keyDown);
     };
   });
 
